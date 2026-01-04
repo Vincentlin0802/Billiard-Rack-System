@@ -327,7 +327,7 @@ header {
 
     @media (orientation: portrait) {
   .site-logo {
-    width: min(88vw, 360px);
+    width: min(120vw, 500px);
     max-height: none;
     margin-bottom: 10px;
   }
@@ -357,12 +357,23 @@ header {
     /* Reshuffle 不要强制 margin-left（否则竖屏容易挤掉） */
     .shuffle-btn { margin-left: 0; }
 
-    /* 桌面整体缩小：避免球/水印/桌子在竖屏显得过大 */
-    .table-container {
-    max-width: 96vw;
-    aspect-ratio: 16 / 9;
-    padding: 10px;
-    margin: 8px auto 12px;
+    /* table-container */
+  .table-container {
+    position: relative;
+    max-width: 96vw; /* 限制最大宽度 */
+    padding: 0;
+    margin: 0 auto;
+  }
+  /* table-surface */
+  .table-surface {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #666666;
+    border-radius: clamp(8px, 2vw, 15px);
+    overflow: hidden;
   }
 
     /* 竖屏时两侧水印缩小，减少遮挡 */
