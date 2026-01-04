@@ -68,14 +68,13 @@ header {
   text-align: center;     /* 文字居中 */
 }
 
-.site-logo {
-  width: clamp(260px, 50vw, 320px); /* 放大 Logo：在 120px 到 180px 之间自适应 */
+/* Logo：永远保持比例，不允许被压扁 */
+  .site-logo {
+  width: clamp(240px, 26vw, 380px);
   height: auto;
-  margin-bottom: 15px; /* 与下方标题的间距 */
-  
-  /* 增强版熔岩发光效果 */
-  filter: drop-shadow(0 0 15px rgba(255, 60, 0, 0.7)); 
-  
+  object-fit: contain;
+  margin-bottom: 12px;
+  filter: drop-shadow(0 0 12px rgba(255, 60, 0, 0.6));
 }
 
 /* 文字微调 */
@@ -319,7 +318,83 @@ header {
   /* 确保动画结束后停留在 translate(-50%, -50%) */
   animation: dropIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
-  </style>
+
+
+@media (orientation: portrait) {
+    /* Header：更紧凑，logo 不变形 + 限高 */
+    header { padding: 16px 14px; }
+    .container { padding: 12px; }
+
+    .site-logo {
+    width: min(78vw, 320px);
+    max-height: 72px;
+  }
+
+    /* 控制面板：更紧凑 */
+    .control-panel {
+      padding: 14px;
+      margin: 10px 0 16px 0;
+    }
+
+    /* 关键：按钮横向排列（必要时换行） */
+    .btn-group {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      padding: 6px 0;
+    }
+
+    button {
+      padding: 12px 16px;
+      font-size: 13px;
+      border-radius: 10px;
+    }
+
+    /* Reshuffle 不要强制 margin-left（否则竖屏容易挤掉） */
+    .shuffle-btn { margin-left: 0; }
+
+    /* 桌面整体缩小：避免球/水印/桌子在竖屏显得过大 */
+    .table-container {
+      max-width: 96vw;
+      margin: 6px auto 10px;
+      padding: 10px;
+      /* 视觉兜底缩放（不影响 JS 定位算法） */
+      transform: scale(0.88);
+      transform-origin: top center;
+    }
+
+    /* 竖屏时两侧水印缩小，减少遮挡 */
+    .andy-side-logo { width: 120px; opacity: 0.7; }
+    .logo-left { left: -22px; }
+    .logo-right { right: -22px; }
+
+    /* Footer 更紧凑 */
+    footer { padding: 18px 14px; }
+  }
+
+  /* =========================================================
+     小屏手机（不区分横竖，仅按宽度兜底）
+     - 修复你之前 max-width:480px 强制按钮 80% 导致竖排的问题
+     - 改为：保持可横排，但允许换行且避免误触
+     ========================================================= */
+  @media (max-width: 480px) {
+    /* 不再强制按钮 80% 宽导致竖排 */
+    .btn-group { gap: 10px; }
+    button { width: auto; max-width: none; }
+
+    /* 若屏幕过窄，按钮可自然换行 */
+    .btn-group button { flex: 1 1 120px; }
+
+    /* 让桌面在超小屏更稳：稍微缩小 */
+    .table-container {
+      max-width: 98vw;
+    }
+
+    /* 水印再缩一点 */
+    .andy-side-logo { width: 110px; opacity: 0.65; }
+  }
+</style>
 </head>
 <body>
   <header>
