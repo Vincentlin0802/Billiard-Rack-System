@@ -325,10 +325,13 @@ header {
     header { padding: 16px 14px; }
     .container { padding: 12px; }
 
-    .site-logo {
-    width: min(78vw, 320px);
-    max-height: 72px;
+    @media (orientation: portrait) {
+  .site-logo {
+    width: min(88vw, 360px);
+    max-height: none;
+    margin-bottom: 10px;
   }
+}
 
     /* 控制面板：更紧凑 */
     .control-panel {
@@ -356,13 +359,11 @@ header {
 
     /* 桌面整体缩小：避免球/水印/桌子在竖屏显得过大 */
     .table-container {
-      max-width: 96vw;
-      margin: 6px auto 10px;
-      padding: 10px;
-      /* 视觉兜底缩放（不影响 JS 定位算法） */
-      transform: scale(0.88);
-      transform-origin: top center;
-    }
+    max-width: 96vw;
+    aspect-ratio: 16 / 9;
+    padding: 10px;
+    margin: 8px auto 12px;
+  }
 
     /* 竖屏时两侧水印缩小，减少遮挡 */
     .andy-side-logo { width: 120px; opacity: 0.7; }
