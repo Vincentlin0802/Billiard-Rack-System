@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Billiard Racking System</title>
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="theme-color" content="#ff3c00">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --neon-blue: #00f3ff;
+      --lava-mid: #ff3c00;
+      --lava-hot: #ff8800;
+      --bg-dark: #120202; /* 极深的暗红色底线 */
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Chakra Petch', Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      /* 升级版：火山熔岩感背景渐变 */
+      background-image: 
+        radial-gradient(circle at 50% 100%, rgba(255, 60, 0, 0.2) 0%, transparent 70%),
+        radial-gradient(circle at 0% 0%, rgba(74, 14, 14, 0.8) 0%, transparent 50%),
+        linear-gradient(180deg, #0d0d0f 0%, #1a0505 100%);
+      background-attachment: fixed;
+      min-height: 100vh;
+      padding-bottom: 20px;
+      color: #eee;
+      overflow-x: hidden;
+    }
+
+    /* 模拟岩浆在地底流动的微弱光晕效果 */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+      opacity: 0.05;
+      pointer-events: none;
+    }
+
+    /* Header 整体改为居中布局 */
+header {
+  background: linear-gradient(to bottom, #2a0a0a, #0a0a12); /* 改为上下渐变增强深度 */
+  border-bottom: 3px solid var(--lava-mid);
+  padding: 30px 20px; /* 增加上下内边距，给大 Logo 空间 */
+}
+    /* Header 布局调整 */
+.header-content {
+  display: flex;
+  flex-direction: column; /* 元素垂直排列 */
+  align-items: center;    /* 水平居中 */
+  justify-content: center;
+  text-align: center;     /* 文字居中 */
+}
+
+.site-logo {
+  width: clamp(260px, 50vw, 320px); /* 放大 Logo：在 120px 到 180px 之间自适应 */
+  height: auto;
+  margin-bottom: 15px; /* 与下方标题的间距 */
+  
+  /* 增强版熔岩发光效果 */
+  filter: drop-shadow(0 0 15px rgba(255, 60, 0, 0.7)); 
+  
+}
+
+/* 文字微调 */
+.header-text h1 {
+  margin: 0;
+  font-size: clamp(0.8rem, 4.5vw, 1.8rem); /* 标题也相应放大一点 */
+}
+
+
+/* 针对手机端的优化 */
+@media (max-width: 480px) {
+  .site-logo {
+    height: 40px; /* 手机上稍微小一点 */
+  }
+  .header-wrapper {
+    gap: 10px;
+  }
+}
+    header h1 {
+      font-size: clamp(1.2rem, 5vw, 1.8rem);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px rgba(255, 60, 0, 0.6);
+    }
+    header p {
+      color: #aaa;
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 15px;
+    }
+
+    /* 控制面板全息风格 */
+    .control-panel {
+      background: rgba(20, 5, 5, 0.7);
+      border: 1px solid rgba(255, 60, 0, 0.4);
+      border-radius: 12px;
+      padding: 20px;
+      margin: 10px 0 25px 0;
+      backdrop-filter: blur(10px);
+      box-shadow: inset 0 0 15px rgba(255, 60, 0, 0.1);
+    }
+    .control-panel h2 {
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+      color: var(--lava-hot);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .control-panel h2::before {
+      content: "";
+      width: 4px;
+      height: 14px;
+      background: var(--lava-mid);
+      display: inline-block;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 10px 0; /* 给组内留出一点呼吸空间 */
+    }
+    button {
+      padding: 15px 30px;
+      border: 2px solid currentColor;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 15px;
+      background: rgba(0,0,0,0.2);
+      text-transform: uppercase;
+
+      /* 增加一个触摸时的反馈效果，防止连点 */
+  touch-action: manipulation;
+    }
+
+    .active-btn {
+      background: var(--neon-blue) !important;
+      color: #000 !important;
+      border-color: var(--neon-blue) !important;
+      box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+    }
+    .inactive-btn {
+      color: #777;
+      border-color: #333;
+    }
+    .inactive-btn:hover {
+      color: #aaa;
+      border-color: #555;
+    }
+    .shuffle-btn {
+      color: var(--lava-mid);
+      border-color: var(--lava-mid);
+      margin-left: 20px;
+    }
+    .shuffle-btn:active {
+      background: var(--lava-mid);
+      color: #fff;
+      transform: translateY(2px);
+    }
+
+    /* 针对手机端的小屏幕优化 */
+@media (max-width: 480px) {
+  .btn-group {
+    gap: 25px; /* 手机端间隙更大 */
+  }
+  button {
+    width: 80%; /* 手机端让按钮占满大部分宽度，上下排列，彻底杜绝左右误触 */
+    max-width: 300px;
+  }
+}
+
+    /* --- 核心：经典球桌区域 --- */
+    .table-container {
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      margin: 10px auto;
+      aspect-ratio: 16/9;
+      background: #5d2e0d; /* 稍深的木纹色，更贴合岩浆背景 */
+      border: 4px solid #3d1f09;
+      border-radius: clamp(12px, 3vw, 24px);
+      padding: clamp(10px, 2vw, 20px);
+      box-shadow: 
+        0 15px 40px rgba(0,0,0,0.8),
+        0 0 20px rgba(255, 60, 0, 0.2);
+    }
+    .table-surface {
+      width: 100%;
+      height: 100%;
+      background: #666666;
+      border-radius: clamp(8px, 2vw, 15px);
+      position: relative;
+      overflow: hidden; /* 防止Logo溢出 */
+      background-size: 30px 30px;
+      /* 强化内阴影：让灰色桌面看起来更有深度 */
+  box-shadow: 
+    inset 0 0 60px rgba(0,0,0,0.3);
+    }
+
+    /* Andy Logo 竖向样式 */
+    .andy-side-logo {
+      position: absolute;
+      top: 50%;
+      width: 160px; /* 控制Logo的大小 */
+      opacity: 0.8; /* 半透明效果，像水印一样 */
+      pointer-events: none;
+    }
+
+    .logo-left {
+      left: -30px;
+      transform: translateY(-50%) rotate(-90deg); /* 逆时针旋转90度竖放 */
+    }
+
+    .logo-right {
+      right: -30px;
+      transform: translateY(-50%) rotate(90deg); /* 顺时针旋转90度竖放 */
+    }
+    .spot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.15); 
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+    #ballsContainer {
+  position: absolute;
+  top: 50%;   /* 改为 50% 垂直居中 */
+  left: 50%;  /* 水平居中 */
+  transform: translate(-50%, -50%);
+  width: 90%;
+  height: 90%;
+  pointer-events: none; /* 防止容器遮挡点击事件 */
+}
+
+    /* --- 核心：经典纯色球体 --- */
+    /* --- 核心：经典纯色球体 --- */
+.ball {
+  position: absolute;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  /* 关键修改：通过 translate(-50%, -50%) 实现真正的中心定位 */
+  transform: translate(-50%, -50%);
+  
+  box-shadow: 
+    inset -4px -4px 8px rgba(0,0,0,0.5),
+    inset 4px 4px 8px rgba(255,255,255,0.3),
+    0 4px 8px rgba(0,0,0,0.4);
+  
+  /* 这里的 transition 要包含 transform */
+  transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+  touch-action: manipulation;
+  font-size: clamp(12px, 2.2vw, 18px);
+  z-index: 20;
+}
+    .ball:hover {
+  /* 悬停时放大，但必须保留之前的 -50% 偏移，否则会跳动 */
+  transform: translate(-50%, -50%) scale(1.15);
+  z-index: 30;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+}
+
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      color: #444;
+      font-size: 0.75rem;
+      letter-spacing: 1px;
+    }
+
+    @keyframes dropIn {
+  0% { 
+    transform: translate(-50%, -100px) scale(0.3); 
+    opacity: 0; 
+  }
+  100% { 
+    transform: translate(-50%, -50%) scale(1); 
+    opacity: 1; 
+  }
+}
+
+.animate-drop {
+  /* 确保动画结束后停留在 translate(-50%, -50%) */
+  animation: dropIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+  </style>
+</head>
+<body>
+  <header>
+  <div class="container header-content">
+    <img src="./icons/2025APC_final.png" alt="Logo" class="site-logo"> 
+    
+    <div class="header-text">
+      <h1>Billiard Racking System</h1>
+    </div>
+  </div>
+</header>
+
+  <div class="container">
+    <div class="control-panel">
+      <h2>Switch Protocol</h2>
+      <div class="btn-group">
+        <button id="nineBallBtn">9 Ball</button>
+        <button id="tenBallBtn">10 Ball</button>
+        <button id="shuffleBtn" class="shuffle-btn">Reshuffle</button>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <div class="table-surface">
+        <img src="./icons/logo-andy.png" class="andy-side-logo logo-left">
+        <img src="./icons/logo-andy.png" class="andy-side-logo logo-right">
+        
+        <div class="spot"></div>
+        <div id="ballsContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>OFFICIAL RACK SYSTEM</p>
+    <p style="margin-top: 5px;">© 2026 Rack Assistant</p>
+  </footer>
+
+  <script>
+    // 经典色值方案
+    const ballColors = {
+      1: '#FFCC00', 2: '#0066FF', 3: '#FF0000', 4: '#9900CC', 5: '#FF9900',
+      6: '#00CC66', 7: '#CC6600', 8: '#000000',
+      9: 'radial-gradient(circle at 30% 30%, white 0%, white 45%, #FFCC00 45%, #FFCC00 100%)',
+      10: 'radial-gradient(circle at 30% 30%, white 0%, white 45%, #0066FF 45%, #0066FF 100%)'
+    };
+
+    const textColors = {
+      1: '#000', 2: '#FFF', 3: '#FFF', 4: '#FFF', 5: '#000',
+      6: '#000', 7: '#FFF', 8: '#FFF', 9: '#000', 10: '#000'
+    };
+
+    let currentGameType = 'nine';
+
+    const nineBallBtn = document.getElementById('nineBallBtn');
+    const tenBallBtn = document.getElementById('tenBallBtn');
+    const shuffleBtn = document.getElementById('shuffleBtn');
+    const ballsContainer = document.getElementById('ballsContainer');
+
+    function updateButtons() {
+      nineBallBtn.className = currentGameType === 'nine' ? 'active-btn' : 'inactive-btn';
+      tenBallBtn.className = currentGameType === 'ten' ? 'active-btn' : 'inactive-btn';
+    }
+
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function generateOrder(type) {
+      if (type === 'nine') {
+        const others = [2, 3, 4, 5, 6, 7, 8];
+        shuffle(others);
+        return [1, others[0], others[1], others[2], 9, others[3], others[4], others[5], others[6]];
+      } else {
+        const others = [2, 3, 4, 5, 6, 7, 8, 9];
+        shuffle(others);
+        return [1, others[0], others[1], others[2], 10, others[3], others[4], others[5], others[6], others[7]];
+      }
+    }
+
+    function calculatePositions(type, ballSize) {
+      const positions = [];
+      const gapRatio = 0.505; // 稍微增加一点点间距防止视觉重叠
+
+      if (type === 'nine') {
+        const hGap = ballSize * gapRatio;
+        const vGap = ballSize * 0.81;
+        const rowY = [-2, -1, 0, 1, 2];
+        positions.push({ x: 0, y: rowY[0] * vGap });
+        positions.push({ x: -0.7 * hGap, y: rowY[1] * vGap });
+        positions.push({ x: 0.7 * hGap, y: rowY[1] * vGap });
+        positions.push({ x: -1.4 * hGap, y: rowY[2] * vGap });
+        positions.push({ x: 0, y: rowY[2] * vGap });
+        positions.push({ x: 1.4 * hGap, y: rowY[2] * vGap });
+        positions.push({ x: -0.7 * hGap, y: rowY[3] * vGap });
+        positions.push({ x: 0.7 * hGap, y: rowY[3] * vGap });
+        positions.push({ x: 0, y: rowY[4] * vGap });
+      } else {
+        const gap = ballSize * 0.91;
+        const rowY = [-1.5, -0.5, 0.5, 1.5];
+        positions.push({ x: 0, y: rowY[0] * gap });
+        positions.push({ x: -0.5 * gap, y: rowY[1] * gap });
+        positions.push({ x: 0.5 * gap, y: rowY[1] * gap });
+        positions.push({ x: -1 * gap, y: rowY[2] * gap });
+        positions.push({ x: 0, y: rowY[2] * gap });
+        positions.push({ x: 1 * gap, y: rowY[2] * gap });
+        positions.push({ x: -1.5 * gap, y: rowY[3] * gap });
+        positions.push({ x: -0.5 * gap, y: rowY[3] * gap });
+        positions.push({ x: 0.5 * gap, y: rowY[3] * gap });
+        positions.push({ x: 1.5 * gap, y: rowY[3] * gap });
+      }
+      return positions;
+    }
+
+    function renderBalls() {
+      ballsContainer.innerHTML = '';
+      const containerWidth = ballsContainer.clientWidth;
+      const ballSize = Math.min(Math.floor(containerWidth / (currentGameType === 'nine' ? 5.5 : 7.5)), 55);
+      const order = generateOrder(currentGameType);
+      const positions = calculatePositions(currentGameType, ballSize);
+
+      order.forEach((num, index) => {
+        const pos = positions[index];
+        const ball = document.createElement('div');
+        ball.className = 'ball';
+        ball.style.width = ballSize + 'px';
+        ball.style.height = ballSize + 'px';
+        ball.style.left = `calc(50% + ${pos.x}px)`;
+        ball.style.top = `calc(50% + ${pos.y}px)`;
+        ball.style.background = ballColors[num];
+        ball.style.color = textColors[num];
+        ball.textContent = num;
+        ballsContainer.appendChild(ball);
+        setTimeout(() => ball.classList.add('animate-drop'), index * 35);
+      });
+    }
+
+    nineBallBtn.addEventListener('click', () => { currentGameType = 'nine'; updateButtons(); renderBalls(); });
+    tenBallBtn.addEventListener('click', () => { currentGameType = 'ten'; updateButtons(); renderBalls(); });
+    shuffleBtn.addEventListener('click', () => { renderBalls(); });
+
+    document.addEventListener('DOMContentLoaded', () => { updateButtons(); renderBalls(); });
+    window.addEventListener('resize', renderBalls);
+  </script>
+</body>
+</html>
