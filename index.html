@@ -515,27 +515,41 @@ header {
     }
 
     function renderBalls() {
-      ballsContainer.innerHTML = '';
-      const containerWidth = ballsContainer.clientWidth;
-      const ballSize = Math.min(Math.floor(containerWidth / (currentGameType === 'nine' ? 5.5 : 7.5)), 55);
-      const order = generateOrder(currentGameType);
-      const positions = calculatePositions(currentGameType, ballSize);
+  ballsContainer.innerHTML = '';
 
-      order.forEach((num, index) => {
-        const pos = positions[index];
-        const ball = document.createElement('div');
-        ball.className = 'ball';
-        ball.style.width = ballSize + 'px';
-        ball.style.height = ballSize + 'px';
-        ball.style.left = `calc(50% + ${pos.x}px)`;
-        ball.style.top = `calc(50% + ${pos.y}px)`;
-        ball.style.background = ballColors[num];
-        ball.style.color = textColors[num];
-        ball.textContent = num;
-        ballsContainer.appendChild(ball);
-        setTimeout(() => ball.classList.add('animate-drop'), index * 35);
-      });
-    }
+  const containerWidth = ballsContainer.clientWidth;
+
+  // 只影响「手机竖屏」：避免误伤电脑/平板/横屏
+  const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+  const isSmallScreen = window.innerWidth <= 480;
+
+  // 基础尺寸：保持你原本的算法
+  let ballSize = Math.floor(
+    containerWidth / (currentGameType === 'nine' ? 5.5 : 7.5)
+  );
+
+  // 上限：横屏/大屏维持 55；仅手机竖屏缩小到 42
+  const maxBallSize = (isPortrait && isSmallScreen) ? 42 : 55;
+  ballSize = Math.min(ballSize, maxBallSize);
+
+  const order = generateOrder(currentGameType);
+  const positions = calculatePositions(currentGameType, ballSize);
+
+  order.forEach((num, index) => {
+    const pos = positions[index];
+    const ball = document.createElement('div');
+    ball.className = 'ball';
+    ball.style.width = ballSize + 'px';
+    ball.style.height = ballSize + 'px';
+    ball.style.left = `calc(50% + ${pos.x}px)`;
+    ball.style.top = `calc(50% + ${pos.y}px)`;
+    ball.style.background = ballColors[num];
+    ball.style.color = textColors[num];
+    ball.textContent = num;
+    ballsContainer.appendChild(ball);
+    setTimeout(() => ball.classList.add('animate-drop'), index * 35);
+  });
+}
 
     nineBallBtn.addEventListener('click', () => { currentGameType = 'nine'; updateButtons(); renderBalls(); });
     tenBallBtn.addEventListener('click', () => { currentGameType = 'ten'; updateButtons(); renderBalls(); });
