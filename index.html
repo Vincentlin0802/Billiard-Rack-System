@@ -409,22 +409,37 @@ header {
     /* 水印再缩一点 */
     .andy-side-logo { width: 110px; opacity: 0.65; }
   }
-@media (min-width: 600px) and (max-width: 1400px) {
-  /* 桌子整体放大：突破 800px 限制 */
-  .table-container {
-    max-width: min(1400px, 98vw);     /* 桌子更大 */
-    --rail: clamp(14px, 2.6vw, 28px); /* rail 稍微厚一点，更像“放大” */
+
+  /* ========== 关键修改：平板放大逻辑 ========== */
+  @media (min-width: 600px) and (max-width: 1400px) {
+    /* 桌子整体放大1.8倍（可调整1.5-2之间），覆盖Lenovo平板宽度范围 */
+    .table-container {
+      max-width: min(1400px, 98vw);     
+      --rail: clamp(20px, 4vw, 40px); /* 球桌边框同步放大 */
+      transform: scale(1.8); /* 核心：整体缩放1.8倍，可改1.5/2 */
+      transform-origin: center top; /* 缩放原点在顶部居中，避免超出屏幕 */
+      margin: 60px auto 80px; /* 增加上下边距，防止缩放后遮挡 */
+    }
+
+    /* 台球容器适配放大后的桌子 */
+    #ballsContainer {
+      width: 96%;
+      height: 96%;
+    }
+
+    /* 侧边Logo同步放大，视觉匹配 */
+    .andy-side-logo {
+      width: 280px; 
+      opacity: 0.85;
+    }
+
+    /* 球桌中心点同步放大 */
+    .spot {
+      width: 16px;
+      height: 16px;
+    }
   }
-
-  /* 内部可用区域稍微更满，视觉更大 */
-  #ballsContainer {
-    width: 96%;
-    height: 96%;
-  }
-}
-
-
-</style>
+  </style>
 </head>
 <body>
   <header>
@@ -433,7 +448,7 @@ header {
     
     <div class="header-text">
       <h1>Billiard Racking System</h1>
-      <p style="color:#fff;opacity:.8">TEST-0124</p>
+      <p style="color:#fff;opacity:.8">TEST-0125</p>
     </div>
   </div>
 </header>
@@ -552,23 +567,27 @@ header {
   // 只影响「手机竖屏」：避免误伤电脑/平板/横屏
   const isPortrait = window.matchMedia("(orientation: portrait)").matches;
   const isSmallScreen = window.innerWidth <= 480;
+  // 识别平板（Lenovo平板宽度范围）
+  const isTablet = window.innerWidth >= 600 && window.innerWidth <= 1400;
 
-  // 基础尺寸：保持你原本的算法
+  // 基础尺寸：保持原本算法
   let ballSize = Math.floor(
     containerWidth / (currentGameType === 'nine' ? 5.5 : 7.5)
   );
 
-  // 额外识别平板（覆盖 Lenovo 平板常见宽度）
-const isTablet = window.innerWidth >= 600 && window.innerWidth <= 1400;
-const tabletScale = isTablet ? 1.6 : 1;
-ballSize = Math.floor(ballSize * tabletScale);
+  // ========== 关键修改：平板台球放大 ==========
+  // 平板下台球同步放大1.8倍，和球桌缩放比例一致
+  if (isTablet) {
+    ballSize = Math.floor(ballSize * 1.8);
+  }
+
+  // 平板缩放系数（同步放大）
+  const tabletScale = isTablet ? 1.8 : 1;
+  ballSize = Math.floor(ballSize * tabletScale);
       
-// 手机竖屏小一点；平板更大；其他保持原样
-const maxBallSize = (isPortrait && isSmallScreen) ? 42 : (isTablet ? 110 : 55);
-ballSize = Math.min(ballSize, maxBallSize);
-
-
-
+  // 调整最大球尺寸：平板放宽限制
+  const maxBallSize = (isPortrait && isSmallScreen) ? 42 : (isTablet ? 200 : 55);
+  ballSize = Math.min(ballSize, maxBallSize);
 
   const order = generateOrder(currentGameType);
   const positions = calculatePositions(currentGameType, ballSize);
