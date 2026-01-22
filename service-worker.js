@@ -1,74 +1,86 @@
 // service-worker.js
-const CACHE_NAME = "rackviz-cyber-v4";
+const CACHE_VERSION = "rackviz-cyber-v5"; // ✅ 每次改布局/放大规则，改这里：v6/v7...
+const STATIC_CACHE = `${CACHE_VERSION}-static`;
+const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 
-// 只缓存：离线必须的本地资源
+// 离线必须的本地资源（App Shell）
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./service-worker.js",
 
-  // icons
+  // icons / images used by page
   "./icons/2025APC_final.png",
   "./icons/logo-andy.png",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
   "./icons/maskable-512.png",
-
-  // 如果你已把背景纹理下载到本地，取消注释
-  // "./assets/textures/carbon-fibre.png",
 ];
 
-// 安装：预缓存 App Shell
 self.addEventListener("install", (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL))
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(STATIC_CACHE);
+    await cache.addAll(APP_SHELL);
+  })());
   self.skipWaiting();
 });
 
-// 激活：清理旧缓存
 self.addEventListener("activate", (event) => {
-  event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : null))
-      )
-    )
-  );
-  self.clients.claim();
+  event.waitUntil((async () => {
+    // ✅ 清理旧版本缓存
+    const keys = await caches.keys();
+    await Promise.all(
+      keys
+        .filter((k) => !k.startsWith(CACHE_VERSION))
+        .map((k) => caches.delete(k))
+    );
+    await self.clients.claim();
+  })());
 });
 
-// Fetch：
-// - 页面导航：离线回落 index.html
-// - 同源资源：cache-first
+// 判断是否为 HTML 导航
+function isNavigationRequest(req) {
+  return req.mode === "navigate" ||
+    (req.headers.get("accept") || "").includes("text/html");
+}
+
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   const url = new URL(req.url);
 
   if (req.method !== "GET") return;
 
-  // 页面导航（从桌面点开 App 最关键）
-  if (req.mode === "navigate") {
-    event.respondWith(
-      fetch(req).catch(() => caches.match("./index.html"))
-    );
+  // 只处理同源
+  if (url.origin !== self.location.origin) return;
+
+  // ✅ 1) HTML 导航：Network First（并把最新页面写回缓存）
+  if (isNavigationRequest(req)) {
+    event.respondWith((async () => {
+      try {
+        const fresh = await fetch(req);
+        // 把最新 HTML 写入 runtime cache，确保离线打开是“新版本”
+        const cache = await caches.open(RUNTIME_CACHE);
+        cache.put(req, fresh.clone());
+        return fresh;
+      } catch (e) {
+        // 离线：优先匹配同一路径缓存；不行就回退到预缓存 index.html
+        const cached = await caches.match(req);
+        return cached || caches.match("./index.html");
+      }
+    })());
     return;
   }
 
-  // 同源资源：缓存优先
-  if (url.origin === self.location.origin) {
-    event.respondWith(
-      caches.match(req).then((cached) => {
-        if (cached) return cached;
-        return fetch(req).then((res) => {
-          if (res && res.ok) {
-            const clone = res.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
-          }
-          return res;
-        });
-      })
-    );
-  }
+  // ✅ 2) 其他同源资源：Cache First + 后台更新缓存
+  event.respondWith((async () => {
+    const cached = await caches.match(req);
+    if (cached) return cached;
+
+    const res = await fetch(req);
+    if (res && res.ok) {
+      const cache = await caches.open(RUNTIME_CACHE);
+      cache.put(req, res.clone());
+    }
+    return res;
+  })());
 });
