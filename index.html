@@ -1,203 +1,190 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Billiard Racking System</title>
 
-  <link rel="manifest" href="manifest.json">
-  <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <meta name="theme-color" content="#ff3c00">
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <meta name="theme-color" content="#ff3c00" />
 
   <style>
-    :root {
-      --neon-blue: #00f3ff;
-      --lava-mid: #ff3c00;
-      --lava-hot: #ff8800;
-      --bg-dark: #120202; /* 极深的暗红色底线 */
+    :root{
+      --neon-blue:#00f3ff;
+      --lava-mid:#ff3c00;
+      --lava-hot:#ff8800;
+      --bg-dark:#120202;
+
+      /* 统一比例系统：所有尺寸都围绕 “可用空间” */
+      --table-max: 1100px;          /* 球桌最大宽度（可调） */
+      --table-vw: 96vw;             /* 球桌占屏比例（可调） */
+      --rail: clamp(12px, 2.2vw, 26px);
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family:
-        system-ui,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        Roboto,
-        Arial,
-        sans-serif;
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
     }
 
-    body {
-      background-color: var(--bg-dark);
+    body{
+      background-color:var(--bg-dark);
       background-image:
         radial-gradient(circle at 50% 100%, rgba(255, 60, 0, 0.2) 0%, transparent 70%),
         radial-gradient(circle at 0% 0%, rgba(74, 14, 14, 0.8) 0%, transparent 50%),
         linear-gradient(180deg, #0d0d0f 0%, #1a0505 100%);
-      background-attachment: fixed;
-      min-height: 100vh;
-      padding-bottom: 20px;
-      color: #eee;
-      overflow-x: hidden;
+      background-attachment:fixed;
+      min-height:100vh;
+      padding-bottom:20px;
+      color:#eee;
+      overflow-x:hidden;
     }
 
-    body::before {
-      content: "";
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      opacity: 0.05;
-      pointer-events: none;
-    }
-
-    header {
+    header{
       background: linear-gradient(to bottom, #2a0a0a, #0a0a12);
-      border-bottom: 3px solid var(--lava-mid);
-      padding: 30px 20px;
+      border-bottom:3px solid var(--lava-mid);
+      padding:26px 20px;
     }
 
-    .header-content {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
+    .container{
+      width:100%;
+      max-width:1200px;
+      margin:0 auto;
+      padding:15px;
     }
 
-    .site-logo {
-      width: clamp(240px, 26vw, 380px);
-      height: auto;
-      object-fit: contain;
-      margin-bottom: 12px;
+    .header-content{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+    }
+
+    .site-logo{
+      width: clamp(220px, 26vw, 380px);
+      height:auto;
+      object-fit:contain;
+      margin-bottom:12px;
       filter: drop-shadow(0 0 12px rgba(255, 60, 0, 0.6));
     }
 
-    .header-text h1 {
-      margin: 0;
-      font-size: clamp(0.8rem, 4.5vw, 1.8rem);
+    header h1{
+      font-size: clamp(1.1rem, 4.2vw, 1.8rem);
+      text-transform:uppercase;
+      letter-spacing:2px;
+      text-shadow:0 0 10px rgba(255, 60, 0, 0.6);
     }
 
-    header h1 {
-      font-size: clamp(1.2rem, 5vw, 1.8rem);
-      text-transform: uppercase;
-      letter-spacing: 2px;
-      text-shadow: 0 0 10px rgba(255, 60, 0, 0.6);
+    header p{
+      color:#aaa;
+      font-size:0.85rem;
+      margin-top:6px;
     }
 
-    header p {
-      color: #aaa;
-      font-size: 0.8rem;
-      margin-top: 4px;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 15px;
-    }
-
-    .control-panel {
+    .control-panel{
       background: rgba(20, 5, 5, 0.7);
-      border: 1px solid rgba(255, 60, 0, 0.4);
-      border-radius: 12px;
-      padding: 20px;
-      margin: 10px 0 25px 0;
+      border:1px solid rgba(255, 60, 0, 0.4);
+      border-radius:12px;
+      padding:20px;
+      margin:10px 0 25px 0;
       backdrop-filter: blur(10px);
       box-shadow: inset 0 0 15px rgba(255, 60, 0, 0.1);
     }
 
-    .control-panel h2 {
-      font-size: 0.9rem;
-      margin-bottom: 15px;
-      color: var(--lava-hot);
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .control-panel h2{
+      font-size:0.9rem;
+      margin-bottom:15px;
+      color:var(--lava-hot);
+      text-transform:uppercase;
+      letter-spacing:1.5px;
+      display:flex;
+      align-items:center;
+      gap:8px;
     }
 
-    .control-panel h2::before {
-      content: "";
-      width: 4px;
-      height: 14px;
-      background: var(--lava-mid);
-      display: inline-block;
+    .control-panel h2::before{
+      content:"";
+      width:4px;
+      height:14px;
+      background:var(--lava-mid);
+      display:inline-block;
     }
 
-    .btn-group {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
-      padding: 10px 0;
+    .btn-group{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      justify-content:center;
+      padding:10px 0;
     }
 
-    button {
-      padding: 15px 30px;
-      border: 2px solid currentColor;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 700;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      font-size: 15px;
+    button{
+      padding:14px 26px;
+      border:2px solid currentColor;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:800;
+      transition: all .25s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size:14px;
       background: rgba(0,0,0,0.2);
-      text-transform: uppercase;
-      touch-action: manipulation;
+      text-transform:uppercase;
+      touch-action:manipulation;
     }
 
-    .active-btn {
-      background: var(--neon-blue) !important;
-      color: #000 !important;
-      border-color: var(--neon-blue) !important;
-      box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+    .active-btn{
+      background:var(--neon-blue)!important;
+      color:#000!important;
+      border-color:var(--neon-blue)!important;
+      box-shadow:0 0 20px rgba(0, 243, 255, 0.5);
     }
 
-    .inactive-btn {
-      color: #777;
-      border-color: #333;
+    .inactive-btn{
+      color:#777;
+      border-color:#333;
+    }
+    .inactive-btn:hover{
+      color:#aaa;
+      border-color:#555;
     }
 
-    .inactive-btn:hover {
-      color: #aaa;
-      border-color: #555;
+    .shuffle-btn{
+      color:var(--lava-mid);
+      border-color:var(--lava-mid);
+      margin-left:20px;
     }
-
-    .shuffle-btn {
-      color: var(--lava-mid);
-      border-color: var(--lava-mid);
-      margin-left: 20px;
-    }
-
-    .shuffle-btn:active {
-      background: var(--lava-mid);
-      color: #fff;
+    .shuffle-btn:active{
+      background:var(--lava-mid);
+      color:#fff;
       transform: translateY(2px);
     }
 
-    /* ========= 手机小屏：按钮体验 ========= */
-    @media (max-width: 480px) {
-      .btn-group { gap: 10px; }
-      button { width: auto; max-width: none; }
-      .btn-group button { flex: 1 1 120px; }
+    /* 手机：按钮更好按 */
+    @media (max-width: 480px){
+      .btn-group{ gap:10px; }
+      .btn-group button{ flex:1 1 120px; }
+      .shuffle-btn{ margin-left:0; }
+      header{ padding:16px 14px; }
+      .container{ padding:12px; }
+      .site-logo{ width:min(92vw, 360px); }
     }
 
-    /* ========= 核心球桌 ========= */
-    .table-container {
-      --rail: clamp(10px, 2vw, 20px);
+    /* =========================
+       统一比例版球桌（不做设备判断）
+       - 宽度：min(96vw, 1100px)  -> 占屏明显且稳定
+       - rail：clamp  -> 自动随空间变化
+       ========================= */
+    .table-container{
+      position:relative;
+      width: min(var(--table-vw), var(--table-max));
+      margin: 14px auto 6px;
+      aspect-ratio: 16 / 9;
 
-      position: relative;
-      width: 100%;
-      max-width: 1200px;
-      margin: 10px auto;
-      aspect-ratio: 16/9;
-
-      background: #5d2e0d;
-      border: 4px solid #3d1f09;
+      background:#5d2e0d;
+      border:4px solid #3d1f09;
       border-radius: clamp(12px, 3vw, 24px);
       padding: var(--rail);
 
@@ -206,175 +193,90 @@
         0 0 20px rgba(255, 60, 0, 0.2);
     }
 
-    .table-surface {
-      position: absolute;
+    .table-surface{
+      position:absolute;
       inset: var(--rail);
-      background: #666666;
+      background:#666666;
       border-radius: clamp(8px, 2vw, 15px);
-      overflow: hidden;
+      overflow:hidden;
       box-shadow: inset 0 0 60px rgba(0,0,0,0.3);
     }
 
-    .andy-side-logo {
-      position: absolute;
-      top: 50%;
-      width: 160px;
-      opacity: 0.8;
-      pointer-events: none;
+    .andy-side-logo{
+      position:absolute;
+      top:50%;
+      width: clamp(120px, 16vw, 240px);
+      opacity:0.82;
+      pointer-events:none;
     }
-
-    .logo-left {
-      left: -30px;
+    .logo-left{
+      left: clamp(-26px, -2.5vw, -16px);
       transform: translateY(-50%) rotate(-90deg);
     }
-
-    .logo-right {
-      right: -30px;
+    .logo-right{
+      right: clamp(-26px, -2.5vw, -16px);
       transform: translateY(-50%) rotate(90deg);
     }
 
-    .spot {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 8px;
-      height: 8px;
-      background: rgba(0, 0, 0, 0.15);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
+    .spot{
+      position:absolute;
+      top:50%;
+      left:50%;
+      width: clamp(8px, 1.2vw, 14px);
+      height: clamp(8px, 1.2vw, 14px);
+      background: rgba(0,0,0,.15);
+      border-radius:50%;
+      transform: translate(-50%,-50%);
     }
 
-    #ballsContainer {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 90%;
-      height: 90%;
-      pointer-events: none;
+    #ballsContainer{
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform: translate(-50%,-50%);
+      width: 92%;
+      height: 92%;
+      pointer-events:none;
     }
 
-    .ball {
-      position: absolute;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      transform: translate(-50%, -50%);
+    .ball{
+      position:absolute;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:900;
+      transform: translate(-50%,-50%);
       box-shadow:
         inset -4px -4px 8px rgba(0,0,0,0.5),
         inset 4px 4px 8px rgba(255,255,255,0.3),
         0 4px 8px rgba(0,0,0,0.4);
-      transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      transition: all 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28);
       touch-action: manipulation;
-      font-size: clamp(20px, 4.5vw, 40px);
-      z-index: 20;
+      z-index:20;
+      user-select:none;
     }
 
-    .ball:hover {
-      transform: translate(-50%, -50%) scale(1.15);
-      z-index: 30;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+    .ball:hover{
+      transform: translate(-50%,-50%) scale(1.12);
+      z-index:30;
+      box-shadow:0 10px 20px rgba(0,0,0,0.6);
     }
 
-    footer {
-      text-align: center;
-      padding: 30px 20px;
-      color: #444;
-      font-size: 0.75rem;
-      letter-spacing: 1px;
+    @keyframes dropIn{
+      0%{ transform: translate(-50%,-100px) scale(0.3); opacity:0; }
+      100%{ transform: translate(-50%,-50%) scale(1); opacity:1; }
     }
-
-    @keyframes dropIn {
-      0% {
-        transform: translate(-50%, -100px) scale(0.3);
-        opacity: 0;
-      }
-      100% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-      }
-    }
-
-    .animate-drop {
+    .animate-drop{
       animation: dropIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
 
-    /* =========================================================
-       只对“小屏竖屏”做压缩（避免误伤平板竖屏）
-       - 你之前的 @media (orientation: portrait) 会影响平板竖屏
-       - 现在限制为：max-width 480 且 portrait
-       ========================================================= */
-    @media (max-width: 480px) and (orientation: portrait) {
-      header { padding: 16px 14px; }
-      .container { padding: 12px; }
-
-      .site-logo {
-        width: min(92vw, 380px); /* 避免 120vw 溢出 */
-        margin-bottom: 10px;
-      }
-
-      .control-panel {
-        padding: 14px;
-        margin: 10px 0 16px 0;
-      }
-
-      .btn-group {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 10px;
-        justify-content: center;
-        padding: 6px 0;
-      }
-
-      button {
-        padding: 12px 16px;
-        font-size: 13px;
-        border-radius: 10px;
-      }
-
-      .shuffle-btn { margin-left: 0; }
-
-      .table-container { max-width: 98vw; }
-
-      .andy-side-logo { width: 110px; opacity: 0.65; }
-      .logo-left { left: -22px; }
-      .logo-right { right: -22px; }
-
-      footer { padding: 18px 14px; }
-    }
-
-    /* =========================================================
-       ✅ 平板横屏放大（仅 landscape）
-       - 球桌整体放大：只在平板横屏
-       - 不在 JS 里重复放大球（避免 1.8*1.8 的 bug）
-       ========================================================= */
-    @media (min-width: 600px) and (max-width: 1400px) and (orientation: landscape) {
-      .table-container {
-        width: 98vw;                 /* ✅ 真实变宽 */
-    max-width: 1400px;           /* ✅ 给高分辨率平板也能命中 */
-    --rail: clamp(20px, 2.8vw, 42px);
-    margin: 30px auto 60px;
-        /* 可选：如果你还想更夸张，再开 scale */
-    transform: scale(1.5);      /* ✅ 比 1.8 更安全，先确保稳定 */
-    transform-origin: center top;
-      }
-
-      #ballsContainer {
-        width: 96%;
-        height: 96%;
-      }
-
-      .andy-side-logo {
-        width: 280px;
-        opacity: 0.85;
-      }
-
-      .spot {
-        width: 16px;
-        height: 16px;
-      }
+    footer{
+      text-align:center;
+      padding:26px 20px;
+      color:#444;
+      font-size:0.75rem;
+      letter-spacing:1px;
     }
   </style>
 </head>
@@ -385,6 +287,7 @@
       <img src="./icons/2025APC_final.png" alt="Logo" class="site-logo">
       <div class="header-text">
         <h1>Billiard Racking System</h1>
+        <p style="color:#fff;opacity:.85">TEST-0125 • UNIFIED-SCALE</p>
       </div>
     </div>
   </header>
@@ -400,7 +303,7 @@
     </div>
 
     <div class="table-container">
-      <div class="table-surface">
+      <div class="table-surface" id="tableSurface">
         <img src="./icons/logo-andy.png" class="andy-side-logo logo-left">
         <img src="./icons/logo-andy.png" class="andy-side-logo logo-right">
 
@@ -421,7 +324,7 @@
       1: '#FFCC00', 2: '#0066FF', 3: '#FF0000', 4: '#9900CC', 5: '#FF9900',
       6: '#00CC66', 7: '#CC6600', 8: '#000000',
       9: 'radial-gradient(circle at 30% 30%, white 0%, white 45%, #FFCC00 45%, #FFCC00 100%)',
-      10: 'radial-gradient(circle at 30% 30%, white 0%, white 45%, #0066FF 45%, #0066FF 100%)'
+      10:'radial-gradient(circle at 30% 30%, white 0%, white 45%, #0066FF 45%, #0066FF 100%)'
     };
 
     const textColors = {
@@ -432,92 +335,104 @@
     let currentGameType = 'nine';
 
     const nineBallBtn = document.getElementById('nineBallBtn');
-    const tenBallBtn = document.getElementById('tenBallBtn');
-    const shuffleBtn = document.getElementById('shuffleBtn');
+    const tenBallBtn  = document.getElementById('tenBallBtn');
+    const shuffleBtn  = document.getElementById('shuffleBtn');
     const ballsContainer = document.getElementById('ballsContainer');
+    const tableSurface = document.getElementById('tableSurface');
 
-    function updateButtons() {
+    function updateButtons(){
       nineBallBtn.className = currentGameType === 'nine' ? 'active-btn' : 'inactive-btn';
-      tenBallBtn.className = currentGameType === 'ten' ? 'active-btn' : 'inactive-btn';
+      tenBallBtn.className  = currentGameType === 'ten'  ? 'active-btn' : 'inactive-btn';
     }
 
-    function shuffle(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
+    function shuffle(arr){
+      for(let i = arr.length - 1; i > 0; i--){
         const j = Math.floor(Math.random() * (i + 1));
         [arr[i], arr[j]] = [arr[j], arr[i]];
       }
       return arr;
     }
 
-    function generateOrder(type) {
-      if (type === 'nine') {
-        const others = [2, 3, 4, 5, 6, 7, 8];
+    function generateOrder(type){
+      if(type === 'nine'){
+        const others = [2,3,4,5,6,7,8];
         shuffle(others);
         return [1, others[0], others[1], others[2], 9, others[3], others[4], others[5], others[6]];
-      } else {
-        const others = [2, 3, 4, 5, 6, 7, 8, 9];
+      }else{
+        const others = [2,3,4,5,6,7,8,9];
         shuffle(others);
         return [1, others[0], others[1], others[2], 10, others[3], others[4], others[5], others[6], others[7]];
       }
     }
 
-    function calculatePositions(type, ballSize) {
+    function calculatePositions(type, ballSize){
       const positions = [];
       const gapRatio = 0.505;
 
-      if (type === 'nine') {
+      if(type === 'nine'){
         const hGap = ballSize * gapRatio;
         const vGap = ballSize * 0.81;
         const rowY = [-2, -1, 0, 1, 2];
-        positions.push({ x: 0, y: rowY[0] * vGap });
-        positions.push({ x: -0.7 * hGap, y: rowY[1] * vGap });
-        positions.push({ x: 0.7 * hGap, y: rowY[1] * vGap });
-        positions.push({ x: -1.4 * hGap, y: rowY[2] * vGap });
-        positions.push({ x: 0, y: rowY[2] * vGap });
-        positions.push({ x: 1.4 * hGap, y: rowY[2] * vGap });
-        positions.push({ x: -0.7 * hGap, y: rowY[3] * vGap });
-        positions.push({ x: 0.7 * hGap, y: rowY[3] * vGap });
-        positions.push({ x: 0, y: rowY[4] * vGap });
-      } else {
+
+        positions.push({ x: 0,          y: rowY[0] * vGap });
+        positions.push({ x: -0.7*hGap,  y: rowY[1] * vGap });
+        positions.push({ x:  0.7*hGap,  y: rowY[1] * vGap });
+        positions.push({ x: -1.4*hGap,  y: rowY[2] * vGap });
+        positions.push({ x: 0,          y: rowY[2] * vGap });
+        positions.push({ x:  1.4*hGap,  y: rowY[2] * vGap });
+        positions.push({ x: -0.7*hGap,  y: rowY[3] * vGap });
+        positions.push({ x:  0.7*hGap,  y: rowY[3] * vGap });
+        positions.push({ x: 0,          y: rowY[4] * vGap });
+      }else{
         const gap = ballSize * 0.91;
         const rowY = [-1.5, -0.5, 0.5, 1.5];
-        positions.push({ x: 0, y: rowY[0] * gap });
-        positions.push({ x: -0.5 * gap, y: rowY[1] * gap });
-        positions.push({ x: 0.5 * gap, y: rowY[1] * gap });
-        positions.push({ x: -1 * gap, y: rowY[2] * gap });
-        positions.push({ x: 0, y: rowY[2] * gap });
-        positions.push({ x: 1 * gap, y: rowY[2] * gap });
-        positions.push({ x: -1.5 * gap, y: rowY[3] * gap });
-        positions.push({ x: -0.5 * gap, y: rowY[3] * gap });
-        positions.push({ x: 0.5 * gap, y: rowY[3] * gap });
-        positions.push({ x: 1.5 * gap, y: rowY[3] * gap });
+
+        positions.push({ x: 0,        y: rowY[0] * gap });
+        positions.push({ x: -0.5*gap, y: rowY[1] * gap });
+        positions.push({ x:  0.5*gap, y: rowY[1] * gap });
+        positions.push({ x: -1*gap,   y: rowY[2] * gap });
+        positions.push({ x: 0,        y: rowY[2] * gap });
+        positions.push({ x:  1*gap,   y: rowY[2] * gap });
+        positions.push({ x: -1.5*gap, y: rowY[3] * gap });
+        positions.push({ x: -0.5*gap, y: rowY[3] * gap });
+        positions.push({ x:  0.5*gap, y: rowY[3] * gap });
+        positions.push({ x:  1.5*gap, y: rowY[3] * gap });
       }
+
       return positions;
     }
 
-    function renderBalls() {
+    function clamp(n, min, max){
+      return Math.max(min, Math.min(max, n));
+    }
+
+    // ✅ 统一比例：ballSize & fontSize 都由“桌面可用宽度”计算
+    function computeBallSize(){
+      // 使用 tableSurface 的可用宽度（比 ballsContainer 更稳定）
+      const w = tableSurface.clientWidth;
+
+      // 9球：宽度约 3 个球 + 间距；10球：约 4 个球 + 间距
+      // 用更稳定的“占宽比例”算直径
+      const base = (currentGameType === 'nine')
+        ? Math.floor(w / 7.2)   // 9球稍大
+        : Math.floor(w / 8.6);  // 10球稍小
+
+      // 给一个合理 clamp：小屏不爆，大屏够大
+      return clamp(base, 30, 110);
+    }
+
+    function computeFontSize(ballSize){
+      // 数字大小 = 球直径的比例（统一比例核心）
+      // 你之前希望更大：0.46~0.50 都可以
+      const fs = Math.floor(ballSize * 0.48);
+      return clamp(fs, 14, 46);
+    }
+
+    function renderBalls(){
       ballsContainer.innerHTML = '';
 
-      const containerWidth = ballsContainer.clientWidth;
-
-      const isPortrait = window.matchMedia("(orientation: portrait)").matches;
-      const isLandscape = window.matchMedia("(orientation: landscape)").matches;
-
-      const isSmallScreen = window.innerWidth <= 480;
-      const isTablet = window.innerWidth >= 600 ;
-      const isTabletLandscape = isTablet && isLandscape;
-
-      // 基础尺寸：保持原本算法（重要：不要再在 JS 里乘 1.8，否则会和 CSS transform 叠加）
-      let ballSize = Math.floor(
-        containerWidth / (currentGameType === 'nine' ? 5.5 : 7.5)
-      );
-
-      // 上限控制：小屏竖屏更小；平板横屏放宽上限（让球跟随放大的桌子更清晰）
-      const maxBallSize =
-        (isPortrait && isSmallScreen) ? 42 :
-        (isTabletLandscape ? 120 : 55);
-
-      ballSize = Math.min(ballSize, maxBallSize);
+      const ballSize = computeBallSize();
+      const fontSize = computeFontSize(ballSize);
 
       const order = generateOrder(currentGameType);
       const positions = calculatePositions(currentGameType, ballSize);
@@ -526,14 +441,19 @@
         const pos = positions[index];
         const ball = document.createElement('div');
         ball.className = 'ball';
+
         ball.style.width = ballSize + 'px';
         ball.style.height = ballSize + 'px';
         ball.style.left = `calc(50% + ${pos.x}px)`;
-        ball.style.top = `calc(50% + ${pos.y}px)`;
+        ball.style.top  = `calc(50% + ${pos.y}px)`;
+
         ball.style.background = ballColors[num];
         ball.style.color = textColors[num];
+        ball.style.fontSize = fontSize + 'px';
+
         ball.textContent = num;
         ballsContainer.appendChild(ball);
+
         setTimeout(() => ball.classList.add('animate-drop'), index * 35);
       });
     }
@@ -554,12 +474,14 @@
       renderBalls();
     });
 
+    // ✅ ResizeObserver：比 window.resize 更可靠（PWA/地址栏变化/横竖切换）
+    const ro = new ResizeObserver(() => renderBalls());
+    ro.observe(tableSurface);
+
     document.addEventListener('DOMContentLoaded', () => {
       updateButtons();
       renderBalls();
     });
-
-    window.addEventListener('resize', renderBalls);
   </script>
 
   <script>
