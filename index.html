@@ -268,7 +268,7 @@
         0 4px 8px rgba(0,0,0,0.4);
       transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
       touch-action: manipulation;
-      font-size: clamp(16px, 3.5vw, 32px);
+      font-size: clamp(18px, 4vw, 36px);
       z-index: 20;
     }
 
@@ -385,7 +385,7 @@
       <img src="./icons/2025APC_final.png" alt="Logo" class="site-logo">
       <div class="header-text">
         <h1>Billiard Racking System</h1>
-        <p style="color:#fff;opacity:.8">TEST-0130</p>
+        <p style="color:#fff;opacity:.8">TEST-0131</p>
       </div>
     </div>
   </header>
@@ -516,7 +516,7 @@
       // 上限控制：小屏竖屏更小；平板横屏放宽上限（让球跟随放大的桌子更清晰）
       const maxBallSize =
         (isPortrait && isSmallScreen) ? 42 :
-        (isTabletLandscape ? 90 : 55);
+        (isTabletLandscape ? 120 : 55);
 
       ballSize = Math.min(ballSize, maxBallSize);
 
