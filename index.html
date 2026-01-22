@@ -192,7 +192,7 @@
 
       position: relative;
       width: 100%;
-      max-width: 800px;
+      max-width: 980px;
       margin: 10px auto;
       aspect-ratio: 16/9;
 
@@ -352,11 +352,13 @@
        ========================================================= */
     @media (min-width: 600px) and (max-width: 1400px) and (orientation: landscape) {
       .table-container {
-        max-width: min(1400px, 98vw);
-        --rail: clamp(20px, 4vw, 40px);
-        transform: scale(4.0);
-        transform-origin: center top;
-        margin: 60px auto 80px;
+        width: 98vw;                 /* ✅ 真实变宽 */
+    max-width: 1400px;           /* ✅ 给高分辨率平板也能命中 */
+    --rail: clamp(20px, 2.8vw, 42px);
+    margin: 30px auto 60px;
+        /* 可选：如果你还想更夸张，再开 scale */
+    transform: scale(1.15);      /* ✅ 比 1.8 更安全，先确保稳定 */
+    transform-origin: center top;
       }
 
       #ballsContainer {
@@ -383,7 +385,7 @@
       <img src="./icons/2025APC_final.png" alt="Logo" class="site-logo">
       <div class="header-text">
         <h1>Billiard Racking System</h1>
-        <p style="color:#fff;opacity:.8">TEST-0127</p>
+        <p style="color:#fff;opacity:.8">TEST-0128</p>
       </div>
     </div>
   </header>
@@ -503,7 +505,7 @@
       const isLandscape = window.matchMedia("(orientation: landscape)").matches;
 
       const isSmallScreen = window.innerWidth <= 480;
-      const isTablet = window.innerWidth >= 600 && window.innerWidth <= 1400;
+      const isTablet = window.innerWidth >= 600 ;
       const isTabletLandscape = isTablet && isLandscape;
 
       // 基础尺寸：保持原本算法（重要：不要再在 JS 里乘 1.8，否则会和 CSS transform 叠加）
