@@ -409,6 +409,24 @@ header {
     /* 水印再缩一点 */
     .andy-side-logo { width: 110px; opacity: 0.65; }
   }
+  /* =========================
+   Lenovo Tablet: enlarge table
+   ========================= */
+
+/* 大多数安卓平板：600px - 1400px */
+@media (min-width: 600px) and (max-width: 1400px) {
+  .table-container {
+    /* 比你原本 800px 更大，且优先吃满屏宽 */
+    max-width: min(1120px, 96vw);
+    margin: 16px auto;
+  }
+
+  /* 轨道厚度稍微加一点（可选） */
+  .table-container {
+    --rail: clamp(12px, 2.2vw, 24px);
+  }
+}
+
 </style>
 </head>
 <body>
@@ -542,9 +560,20 @@ header {
     containerWidth / (currentGameType === 'nine' ? 5.5 : 7.5)
   );
 
-  // 上限：横屏/大屏维持 55；仅手机竖屏缩小到 42
-  const maxBallSize = (isPortrait && isSmallScreen) ? 42 : 55;
-  ballSize = Math.min(ballSize, maxBallSize);
+  // 只影响「手机竖屏」与「平板」：电脑端保持克制
+const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+const isSmallPhone = window.innerWidth <= 480;
+
+// 简单识别平板：宽度 >= 600 且 <= 1400（覆盖 Lenovo 多数型号）
+const isTablet = window.innerWidth >= 600 && window.innerWidth <= 1400;
+
+// 手机竖屏：小一点；平板：更大；其他（电脑/大屏）：维持你原本的 55
+const maxBallSize = isSmallPhone
+  ? 42
+  : (isTablet ? 70 : 55);
+
+ballSize = Math.min(ballSize, maxBallSize);
+
 
   const order = generateOrder(currentGameType);
   const positions = calculatePositions(currentGameType, ballSize);
