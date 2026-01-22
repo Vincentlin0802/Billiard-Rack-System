@@ -10,7 +10,6 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <meta name="theme-color" content="#ff3c00">
 
-
   <style>
     :root {
       --neon-blue: #00f3ff;
@@ -24,19 +23,18 @@
       padding: 0;
       box-sizing: border-box;
       font-family:
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    Arial,
-    sans-serif;
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
     }
-  
+
     body {
       background-color: var(--bg-dark);
-      /* 升级版：火山熔岩感背景渐变 */
-      background-image: 
+      background-image:
         radial-gradient(circle at 50% 100%, rgba(255, 60, 0, 0.2) 0%, transparent 70%),
         radial-gradient(circle at 0% 0%, rgba(74, 14, 14, 0.8) 0%, transparent 50%),
         linear-gradient(180deg, #0d0d0f 0%, #1a0505 100%);
@@ -47,7 +45,6 @@
       overflow-x: hidden;
     }
 
-    /* 模拟岩浆在地底流动的微弱光晕效果 */
     body::before {
       content: "";
       position: fixed;
@@ -56,52 +53,40 @@
       pointer-events: none;
     }
 
-    /* Header 整体改为居中布局 */
-header {
-  background: linear-gradient(to bottom, #2a0a0a, #0a0a12); /* 改为上下渐变增强深度 */
-  border-bottom: 3px solid var(--lava-mid);
-  padding: 30px 20px; /* 增加上下内边距，给大 Logo 空间 */
-}
-    /* Header 布局调整 */
-.header-content {
-  display: flex;
-  flex-direction: column; /* 元素垂直排列 */
-  align-items: center;    /* 水平居中 */
-  justify-content: center;
-  text-align: center;     /* 文字居中 */
-}
+    header {
+      background: linear-gradient(to bottom, #2a0a0a, #0a0a12);
+      border-bottom: 3px solid var(--lava-mid);
+      padding: 30px 20px;
+    }
 
-/* Logo：永远保持比例，不允许被压扁 */
-  .site-logo {
-  width: clamp(240px, 26vw, 380px);
-  height: auto;
-  object-fit: contain;
-  margin-bottom: 12px;
-  filter: drop-shadow(0 0 12px rgba(255, 60, 0, 0.6));
-}
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
 
-/* 文字微调 */
-.header-text h1 {
-  margin: 0;
-  font-size: clamp(0.8rem, 4.5vw, 1.8rem); /* 标题也相应放大一点 */
-}
+    .site-logo {
+      width: clamp(240px, 26vw, 380px);
+      height: auto;
+      object-fit: contain;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 0 12px rgba(255, 60, 0, 0.6));
+    }
 
+    .header-text h1 {
+      margin: 0;
+      font-size: clamp(0.8rem, 4.5vw, 1.8rem);
+    }
 
-/* 针对手机端的优化 */
-@media (max-width: 480px) {
-  .site-logo {
-    height: 40px; /* 手机上稍微小一点 */
-  }
-  .header-wrapper {
-    gap: 10px;
-  }
-}
     header h1 {
       font-size: clamp(1.2rem, 5vw, 1.8rem);
       text-transform: uppercase;
       letter-spacing: 2px;
       text-shadow: 0 0 10px rgba(255, 60, 0, 0.6);
     }
+
     header p {
       color: #aaa;
       font-size: 0.8rem;
@@ -115,7 +100,6 @@ header {
       padding: 15px;
     }
 
-    /* 控制面板全息风格 */
     .control-panel {
       background: rgba(20, 5, 5, 0.7);
       border: 1px solid rgba(255, 60, 0, 0.4);
@@ -125,6 +109,7 @@ header {
       backdrop-filter: blur(10px);
       box-shadow: inset 0 0 15px rgba(255, 60, 0, 0.1);
     }
+
     .control-panel h2 {
       font-size: 0.9rem;
       margin-bottom: 15px;
@@ -135,6 +120,7 @@ header {
       align-items: center;
       gap: 8px;
     }
+
     .control-panel h2::before {
       content: "";
       width: 4px;
@@ -148,8 +134,9 @@ header {
       gap: 12px;
       flex-wrap: wrap;
       justify-content: center;
-      padding: 10px 0; /* 给组内留出一点呼吸空间 */
+      padding: 10px 0;
     }
+
     button {
       padding: 15px 30px;
       border: 2px solid currentColor;
@@ -160,9 +147,7 @@ header {
       font-size: 15px;
       background: rgba(0,0,0,0.2);
       text-transform: uppercase;
-
-      /* 增加一个触摸时的反馈效果，防止连点 */
-  touch-action: manipulation;
+      touch-action: manipulation;
     }
 
     .active-btn {
@@ -171,134 +156,127 @@ header {
       border-color: var(--neon-blue) !important;
       box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
     }
+
     .inactive-btn {
       color: #777;
       border-color: #333;
     }
+
     .inactive-btn:hover {
       color: #aaa;
       border-color: #555;
     }
+
     .shuffle-btn {
       color: var(--lava-mid);
       border-color: var(--lava-mid);
       margin-left: 20px;
     }
+
     .shuffle-btn:active {
       background: var(--lava-mid);
       color: #fff;
       transform: translateY(2px);
     }
 
-    /* 针对手机端的小屏幕优化 */
-@media (max-width: 480px) {
-  .btn-group {
-    gap: 25px; /* 手机端间隙更大 */
-  }
-  button {
-    width: 80%; /* 手机端让按钮占满大部分宽度，上下排列，彻底杜绝左右误触 */
-    max-width: 300px;
-  }
-}
+    /* ========= 手机小屏：按钮体验 ========= */
+    @media (max-width: 480px) {
+      .btn-group { gap: 10px; }
+      button { width: auto; max-width: none; }
+      .btn-group button { flex: 1 1 120px; }
+    }
 
-    /* --- 核心：经典球桌区域 --- */
+    /* ========= 核心球桌 ========= */
     .table-container {
-  --rail: clamp(10px, 2vw, 20px); /* 原本的 padding 值抽成变量 */
+      --rail: clamp(10px, 2vw, 20px);
 
-  position: relative;
-  width: 100%;
-  max-width: 800px;
-  margin: 10px auto;
-  aspect-ratio: 16/9;
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      margin: 10px auto;
+      aspect-ratio: 16/9;
 
-  background: #5d2e0d;
-  border: 4px solid #3d1f09;
-  border-radius: clamp(12px, 3vw, 24px);
-  padding: var(--rail);
+      background: #5d2e0d;
+      border: 4px solid #3d1f09;
+      border-radius: clamp(12px, 3vw, 24px);
+      padding: var(--rail);
 
-  box-shadow:
-    0 15px 40px rgba(0,0,0,0.8),
-    0 0 20px rgba(255, 60, 0, 0.2);
-}
+      box-shadow:
+        0 15px 40px rgba(0,0,0,0.8),
+        0 0 20px rgba(255, 60, 0, 0.2);
+    }
 
     .table-surface {
-  position: absolute;
-  inset: var(--rail);            /* 关键：严格落在 padding 内，不会越界 */
-  background: #666666;
-  border-radius: clamp(8px, 2vw, 15px);
-  overflow: hidden;
-  box-shadow: inset 0 0 60px rgba(0,0,0,0.3);
-}
+      position: absolute;
+      inset: var(--rail);
+      background: #666666;
+      border-radius: clamp(8px, 2vw, 15px);
+      overflow: hidden;
+      box-shadow: inset 0 0 60px rgba(0,0,0,0.3);
+    }
 
-
-    /* Andy Logo 竖向样式 */
     .andy-side-logo {
       position: absolute;
       top: 50%;
-      width: 160px; /* 控制Logo的大小 */
-      opacity: 0.8; /* 半透明效果，像水印一样 */
+      width: 160px;
+      opacity: 0.8;
       pointer-events: none;
     }
 
     .logo-left {
       left: -30px;
-      transform: translateY(-50%) rotate(-90deg); /* 逆时针旋转90度竖放 */
+      transform: translateY(-50%) rotate(-90deg);
     }
 
     .logo-right {
       right: -30px;
-      transform: translateY(-50%) rotate(90deg); /* 顺时针旋转90度竖放 */
+      transform: translateY(-50%) rotate(90deg);
     }
+
     .spot {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 8px;
-  height: 8px;
-  background: rgba(0, 0, 0, 0.15); 
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-}
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 8px;
+      height: 8px;
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
 
     #ballsContainer {
-  position: absolute;
-  top: 50%;   /* 改为 50% 垂直居中 */
-  left: 50%;  /* 水平居中 */
-  transform: translate(-50%, -50%);
-  width: 90%;
-  height: 90%;
-  pointer-events: none; /* 防止容器遮挡点击事件 */
-}
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      height: 90%;
+      pointer-events: none;
+    }
 
-    /* --- 核心：经典纯色球体 --- */
-    /* --- 核心：经典纯色球体 --- */
-.ball {
-  position: absolute;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  /* 关键修改：通过 translate(-50%, -50%) 实现真正的中心定位 */
-  transform: translate(-50%, -50%);
-  
-  box-shadow: 
-    inset -4px -4px 8px rgba(0,0,0,0.5),
-    inset 4px 4px 8px rgba(255,255,255,0.3),
-    0 4px 8px rgba(0,0,0,0.4);
-  
-  /* 这里的 transition 要包含 transform */
-  transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-  touch-action: manipulation;
-  font-size: clamp(12px, 2.2vw, 18px);
-  z-index: 20;
-}
+    .ball {
+      position: absolute;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      transform: translate(-50%, -50%);
+      box-shadow:
+        inset -4px -4px 8px rgba(0,0,0,0.5),
+        inset 4px 4px 8px rgba(255,255,255,0.3),
+        0 4px 8px rgba(0,0,0,0.4);
+      transition: all 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      touch-action: manipulation;
+      font-size: clamp(12px, 2.2vw, 18px);
+      z-index: 20;
+    }
+
     .ball:hover {
-  /* 悬停时放大，但必须保留之前的 -50% 偏移，否则会跳动 */
-  transform: translate(-50%, -50%) scale(1.15);
-  z-index: 30;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.6);
-}
+      transform: translate(-50%, -50%) scale(1.15);
+      z-index: 30;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+    }
 
     footer {
       text-align: center;
@@ -309,149 +287,106 @@ header {
     }
 
     @keyframes dropIn {
-  0% { 
-    transform: translate(-50%, -100px) scale(0.3); 
-    opacity: 0; 
-  }
-  100% { 
-    transform: translate(-50%, -50%) scale(1); 
-    opacity: 1; 
-  }
-}
-
-.animate-drop {
-  /* 确保动画结束后停留在 translate(-50%, -50%) */
-  animation: dropIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-
-@media (orientation: portrait) {
-    /* Header：更紧凑，logo 不变形 + 限高 */
-    header { padding: 16px 14px; }
-    .container { padding: 12px; }
-
-  .site-logo {
-    width: min(120vw, 500px);
-    max-height: none;
-    margin-bottom: 10px;
-  }
-
-    /* 控制面板：更紧凑 */
-    .control-panel {
-      padding: 14px;
-      margin: 10px 0 16px 0;
+      0% {
+        transform: translate(-50%, -100px) scale(0.3);
+        opacity: 0;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
     }
 
-    /* 关键：按钮横向排列（必要时换行） */
-    .btn-group {
-      flex-direction: row;
-      flex-wrap: wrap;
-      gap: 10px;
-      justify-content: center;
-      padding: 6px 0;
+    .animate-drop {
+      animation: dropIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
     }
 
-    button {
-      padding: 12px 16px;
-      font-size: 13px;
-      border-radius: 10px;
+    /* =========================================================
+       只对“小屏竖屏”做压缩（避免误伤平板竖屏）
+       - 你之前的 @media (orientation: portrait) 会影响平板竖屏
+       - 现在限制为：max-width 480 且 portrait
+       ========================================================= */
+    @media (max-width: 480px) and (orientation: portrait) {
+      header { padding: 16px 14px; }
+      .container { padding: 12px; }
+
+      .site-logo {
+        width: min(92vw, 380px); /* 避免 120vw 溢出 */
+        margin-bottom: 10px;
+      }
+
+      .control-panel {
+        padding: 14px;
+        margin: 10px 0 16px 0;
+      }
+
+      .btn-group {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        padding: 6px 0;
+      }
+
+      button {
+        padding: 12px 16px;
+        font-size: 13px;
+        border-radius: 10px;
+      }
+
+      .shuffle-btn { margin-left: 0; }
+
+      .table-container { max-width: 98vw; }
+
+      .andy-side-logo { width: 110px; opacity: 0.65; }
+      .logo-left { left: -22px; }
+      .logo-right { right: -22px; }
+
+      footer { padding: 18px 14px; }
     }
 
-    /* Reshuffle 不要强制 margin-left（否则竖屏容易挤掉） */
-    .shuffle-btn { margin-left: 0; }
+    /* =========================================================
+       ✅ 平板横屏放大（仅 landscape）
+       - 球桌整体放大：只在平板横屏
+       - 不在 JS 里重复放大球（避免 1.8*1.8 的 bug）
+       ========================================================= */
+    @media (min-width: 600px) and (max-width: 1400px) and (orientation: landscape) {
+      .table-container {
+        max-width: min(1400px, 98vw);
+        --rail: clamp(20px, 4vw, 40px);
+        transform: scale(1.8);
+        transform-origin: center top;
+        margin: 60px auto 80px;
+      }
 
-    /* table-container */
-  .table-container {
-    position: relative;
-    max-width: 96vw; /* 限制最大宽度 */
-    padding: 0;
-    margin: 0 auto;
-  }
-  /* table-surface */
-  .table-surface {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: #666666;
-    border-radius: clamp(8px, 2vw, 15px);
-    overflow: hidden;
-  }
+      #ballsContainer {
+        width: 96%;
+        height: 96%;
+      }
 
-    /* 竖屏时两侧水印缩小，减少遮挡 */
-    .andy-side-logo { width: 120px; opacity: 0.7; }
-    .logo-left { left: -22px; }
-    .logo-right { right: -22px; }
+      .andy-side-logo {
+        width: 280px;
+        opacity: 0.85;
+      }
 
-    /* Footer 更紧凑 */
-    footer { padding: 18px 14px; }
-  }
-
-  /* =========================================================
-     小屏手机（不区分横竖，仅按宽度兜底）
-     - 修复你之前 max-width:480px 强制按钮 80% 导致竖排的问题
-     - 改为：保持可横排，但允许换行且避免误触
-     ========================================================= */
-  @media (max-width: 480px) {
-    /* 不再强制按钮 80% 宽导致竖排 */
-    .btn-group { gap: 10px; }
-    button { width: auto; max-width: none; }
-
-    /* 若屏幕过窄，按钮可自然换行 */
-    .btn-group button { flex: 1 1 120px; }
-
-    /* 让桌面在超小屏更稳：稍微缩小 */
-    .table-container {
-      max-width: 98vw;
+      .spot {
+        width: 16px;
+        height: 16px;
+      }
     }
-
-    /* 水印再缩一点 */
-    .andy-side-logo { width: 110px; opacity: 0.65; }
-  }
-
-  /* ========== 关键修改：平板放大逻辑 ========== */
-  @media (min-width: 600px) and (max-width: 1400px) {
-    /* 桌子整体放大1.8倍（可调整1.5-2之间），覆盖Lenovo平板宽度范围 */
-    .table-container {
-      max-width: min(1400px, 98vw);     
-      --rail: clamp(20px, 4vw, 40px); /* 球桌边框同步放大 */
-      transform: scale(1.8); /* 核心：整体缩放1.8倍，可改1.5/2 */
-      transform-origin: center top; /* 缩放原点在顶部居中，避免超出屏幕 */
-      margin: 60px auto 80px; /* 增加上下边距，防止缩放后遮挡 */
-    }
-
-    /* 台球容器适配放大后的桌子 */
-    #ballsContainer {
-      width: 96%;
-      height: 96%;
-    }
-
-    /* 侧边Logo同步放大，视觉匹配 */
-    .andy-side-logo {
-      width: 280px; 
-      opacity: 0.85;
-    }
-
-    /* 球桌中心点同步放大 */
-    .spot {
-      width: 16px;
-      height: 16px;
-    }
-  }
   </style>
 </head>
+
 <body>
   <header>
-  <div class="container header-content">
-    <img src="./icons/2025APC_final.png" alt="Logo" class="site-logo"> 
-    
-    <div class="header-text">
-      <h1>Billiard Racking System</h1>
-      <p style="color:#fff;opacity:.8">TEST-0125</p>
+    <div class="container header-content">
+      <img src="./icons/2025APC_final.png" alt="Logo" class="site-logo">
+      <div class="header-text">
+        <h1>Billiard Racking System</h1>
+        <p style="color:#fff;opacity:.8">TEST-0126</p>
+      </div>
     </div>
-  </div>
-</header>
+  </header>
 
   <div class="container">
     <div class="control-panel">
@@ -467,7 +402,7 @@ header {
       <div class="table-surface">
         <img src="./icons/logo-andy.png" class="andy-side-logo logo-left">
         <img src="./icons/logo-andy.png" class="andy-side-logo logo-right">
-        
+
         <div class="spot"></div>
         <div id="ballsContainer"></div>
       </div>
@@ -527,7 +462,7 @@ header {
 
     function calculatePositions(type, ballSize) {
       const positions = [];
-      const gapRatio = 0.505; // 稍微增加一点点间距防止视觉重叠
+      const gapRatio = 0.505;
 
       if (type === 'nine') {
         const hGap = ballSize * gapRatio;
@@ -560,69 +495,80 @@ header {
     }
 
     function renderBalls() {
-  ballsContainer.innerHTML = '';
+      ballsContainer.innerHTML = '';
 
-  const containerWidth = ballsContainer.clientWidth;
+      const containerWidth = ballsContainer.clientWidth;
 
-  // 只影响「手机竖屏」：避免误伤电脑/平板/横屏
-  const isPortrait = window.matchMedia("(orientation: portrait)").matches;
-  const isSmallScreen = window.innerWidth <= 480;
-  // 识别平板（Lenovo平板宽度范围）
-  const isTablet = window.innerWidth >= 600 && window.innerWidth <= 1400;
+      const isPortrait = window.matchMedia("(orientation: portrait)").matches;
+      const isLandscape = window.matchMedia("(orientation: landscape)").matches;
 
-  // 基础尺寸：保持原本算法
-  let ballSize = Math.floor(
-    containerWidth / (currentGameType === 'nine' ? 5.5 : 7.5)
-  );
+      const isSmallScreen = window.innerWidth <= 480;
+      const isTablet = window.innerWidth >= 600 && window.innerWidth <= 1400;
+      const isTabletLandscape = isTablet && isLandscape;
 
-  // ========== 关键修改：平板台球放大 ==========
-  // 平板下台球同步放大1.8倍，和球桌缩放比例一致
-  if (isTablet) {
-    ballSize = Math.floor(ballSize * 1.8);
-  }
+      // 基础尺寸：保持原本算法（重要：不要再在 JS 里乘 1.8，否则会和 CSS transform 叠加）
+      let ballSize = Math.floor(
+        containerWidth / (currentGameType === 'nine' ? 5.5 : 7.5)
+      );
 
-  // 平板缩放系数（同步放大）
-  const tabletScale = isTablet ? 1.8 : 1;
-  ballSize = Math.floor(ballSize * tabletScale);
-      
-  // 调整最大球尺寸：平板放宽限制
-  const maxBallSize = (isPortrait && isSmallScreen) ? 42 : (isTablet ? 200 : 55);
-  ballSize = Math.min(ballSize, maxBallSize);
+      // 上限控制：小屏竖屏更小；平板横屏放宽上限（让球跟随放大的桌子更清晰）
+      const maxBallSize =
+        (isPortrait && isSmallScreen) ? 42 :
+        (isTabletLandscape ? 90 : 55);
 
-  const order = generateOrder(currentGameType);
-  const positions = calculatePositions(currentGameType, ballSize);
+      ballSize = Math.min(ballSize, maxBallSize);
 
-  order.forEach((num, index) => {
-    const pos = positions[index];
-    const ball = document.createElement('div');
-    ball.className = 'ball';
-    ball.style.width = ballSize + 'px';
-    ball.style.height = ballSize + 'px';
-    ball.style.left = `calc(50% + ${pos.x}px)`;
-    ball.style.top = `calc(50% + ${pos.y}px)`;
-    ball.style.background = ballColors[num];
-    ball.style.color = textColors[num];
-    ball.textContent = num;
-    ballsContainer.appendChild(ball);
-    setTimeout(() => ball.classList.add('animate-drop'), index * 35);
-  });
-}
+      const order = generateOrder(currentGameType);
+      const positions = calculatePositions(currentGameType, ballSize);
 
-    nineBallBtn.addEventListener('click', () => { currentGameType = 'nine'; updateButtons(); renderBalls(); });
-    tenBallBtn.addEventListener('click', () => { currentGameType = 'ten'; updateButtons(); renderBalls(); });
-    shuffleBtn.addEventListener('click', () => { renderBalls(); });
+      order.forEach((num, index) => {
+        const pos = positions[index];
+        const ball = document.createElement('div');
+        ball.className = 'ball';
+        ball.style.width = ballSize + 'px';
+        ball.style.height = ballSize + 'px';
+        ball.style.left = `calc(50% + ${pos.x}px)`;
+        ball.style.top = `calc(50% + ${pos.y}px)`;
+        ball.style.background = ballColors[num];
+        ball.style.color = textColors[num];
+        ball.textContent = num;
+        ballsContainer.appendChild(ball);
+        setTimeout(() => ball.classList.add('animate-drop'), index * 35);
+      });
+    }
 
-    document.addEventListener('DOMContentLoaded', () => { updateButtons(); renderBalls(); });
+    nineBallBtn.addEventListener('click', () => {
+      currentGameType = 'nine';
+      updateButtons();
+      renderBalls();
+    });
+
+    tenBallBtn.addEventListener('click', () => {
+      currentGameType = 'ten';
+      updateButtons();
+      renderBalls();
+    });
+
+    shuffleBtn.addEventListener('click', () => {
+      renderBalls();
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateButtons();
+      renderBalls();
+    });
+
     window.addEventListener('resize', renderBalls);
   </script>
+
   <script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./service-worker.js")
-        .then(() => console.log("Service Worker registered"))
-        .catch(err => console.log("SW registration failed:", err));
-    });
-  }
-</script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js")
+          .then(() => console.log("Service Worker registered"))
+          .catch(err => console.log("SW registration failed:", err));
+      });
+    }
+  </script>
 </body>
 </html>
