@@ -40,10 +40,8 @@ self.addEventListener("activate", (event) => {
 
 // 判断是否为 HTML 导航
 function isNavigationRequest(req) {
-  return (
-    req.mode === "navigate" ||
-    (req.headers.get("accept") || "").includes("text/html")
-  );
+  return req.mode === "navigate" ||
+    (req.headers.get("accept") || "").includes("text/html");
 }
 
 self.addEventListener("fetch", (event) => {
@@ -55,54 +53,34 @@ self.addEventListener("fetch", (event) => {
   // 只处理同源
   if (url.origin !== self.location.origin) return;
 
-  // ✅ 1) HTML 导航：Stale-While-Revalidate（缓存优先 + 后台更新）
+  // ✅ 1) HTML 导航：Network First（并把最新页面写回缓存）
   if (isNavigationRequest(req)) {
     event.respondWith((async () => {
-      // 先从 runtime 找（保证你“在线时更新过的最新 HTML”能离线打开）
-      const runtimeCache = await caches.open(RUNTIME_CACHE);
-      const cachedRuntime = await runtimeCache.match(req);
-
-      // 再兜底到预缓存的 index.html（适合 SPA / GitHub Pages）
-      const cachedShell = await caches.match("./index.html");
-
-      // 后台更新：不阻塞页面返回
-      const updatePromise = fetch(req)
-        .then((fresh) => {
-          if (fresh && fresh.ok) {
-            runtimeCache.put(req, fresh.clone());
-          }
-          return fresh;
-        })
-        .catch(() => null);
-
-      // 关键：先返回缓存（避免慢网卡死），同时触发后台更新
-      return cachedRuntime || cachedShell || (await updatePromise) || cachedShell;
+      try {
+        const fresh = await fetch(req);
+        // 把最新 HTML 写入 runtime cache，确保离线打开是“新版本”
+        const cache = await caches.open(RUNTIME_CACHE);
+        cache.put(req, fresh.clone());
+        return fresh;
+      } catch (e) {
+        // 离线：优先匹配同一路径缓存；不行就回退到预缓存 index.html
+        const cached = await caches.match(req);
+        return cached || caches.match("./index.html");
+      }
     })());
     return;
   }
 
-  // ✅ 2) 其他同源资源：Cache First +（可选）后台更新
+  // ✅ 2) 其他同源资源：Cache First + 后台更新缓存
   event.respondWith((async () => {
-    const cache = await caches.open(RUNTIME_CACHE);
-    const cached = await cache.match(req);
-    if (cached) {
-      // 可选：后台更新（不阻塞）
-      event.waitUntil(
-        fetch(req)
-          .then((res) => {
-            if (res && res.ok) cache.put(req, res.clone());
-          })
-          .catch(() => {})
-      );
-      return cached;
-    }
+    const cached = await caches.match(req);
+    if (cached) return cached;
 
-    try {
-      const res = await fetch(req);
-      if (res && res.ok) cache.put(req, res.clone());
-      return res;
-    } catch (e) {
-      return cached || Response.error();
+    const res = await fetch(req);
+    if (res && res.ok) {
+      const cache = await caches.open(RUNTIME_CACHE);
+      cache.put(req, res.clone());
     }
+    return res;
   })());
 });
